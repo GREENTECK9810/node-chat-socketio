@@ -46,10 +46,21 @@ router.get('/users/logout', auth, async(req, res) => {
     } catch (error) {
         res.status(500).send()
     }
+
+})
+
+//get user
+router.get('/users/user', auth, async(req, res) => {
+    console.log('find user')
+    try {
+        const user = await User.findOne({username : req.query.username})
+        console.log(user)
+        res.status(200).send(user)
+    } catch (error) {
+        res.status(404).send(error)
+    }
     
-
-
-
+    
 })
 
 module.exports = router
