@@ -4,6 +4,7 @@ const userRoute = require('./routers/user')
 const socketio = require('socket.io')
 const User = require('./models/users')
 const OnlineUser = require('./models/onlineUsers')
+const onlineUser = require('./models/onlineUsers')
 require('./db/mongoose')
 
 
@@ -26,19 +27,17 @@ io.on('connection',  (socket) => {
     console.log('new connection : ' + socket.id)
     console.log(`user ${socket.handshake.query.username} connected`)
     addUserToOnlineUsers(socket.handshake.query.username, socket.id)
-    socket.on('connect', () => {
-        console.log('connect socket called!!')
-    })
 
     socket.on('message', () => {
         console.log("message connect")
     })
 
     //sends private message
-    socket.on('private message', (anotherSocketId, message) => {
-
+    socket.on('private message', (message) => {
         
-        socket.to(anotherSocketId).emit("private message", socket.id, message);
+        console.log(message.from + " " + message.to + " " + message.message)
+        sendPrivateMessage(socket, message)
+        //socket.to(anotherSocketId).emit("private message", socket.handshake.query.username, message);
 
 
     })
@@ -67,12 +66,29 @@ const addUserToOnlineUsers = async (username, socket) => {
 const deleteUserFromOnlineUser = async (username) => {
     try {
         await OnlineUser.findOneAndDelete({username})
+        console.log('online user deleted')
         return true
     } catch (error) {
+        console.log('unable to delete online user : ' + error)
         return false
     }
 }
 
+
+const sendPrivateMessage = async (socket, message) => {
+    try {
+        const user = await OnlineUser.findOne({username : message.to})
+        const sockets = user.sockets
+        if(user !== null){
+            sockets.forEach(element => {
+                socket.to(element.socket).emit("private message", {username : message.from, message: message.message})
+            });
+            
+        }
+    } catch (error) {
+        console.log('unable to find user')
+    }
+}
 
 
 
