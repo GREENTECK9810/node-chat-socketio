@@ -54,13 +54,26 @@ router.get('/users/user', auth, async(req, res) => {
     console.log('find user')
     try {
         const user = await User.findOne({username : req.query.username})
-        console.log(user)
         res.status(200).send(user)
     } catch (error) {
         res.status(404).send(error)
     }
     
     
+})
+
+//add firebase token
+router.get('/users/firebasetoken', auth, async (req, res) => {
+
+    try {
+        const user = req.user
+        user.firebasetoken = req.query.firebaseToken
+        console.log('token added : ' + user.firebasetoken)
+        await user.save()
+        res.status(200).send(user)
+    } catch (error) {
+        console.log(error)
+    }
 })
 
 module.exports = router

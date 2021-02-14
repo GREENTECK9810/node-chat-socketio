@@ -33,10 +33,10 @@ io.on('connection',  (socket) => {
     })
 
     //sends private message
-    socket.on('private message', (message) => {
+    socket.on('private message', (message, callback) => {
         
         console.log(message.from + " " + message.to + " " + message.message)
-        sendPrivateMessage(socket, message)
+        sendPrivateMessage(socket, message, callback)
         //socket.to(anotherSocketId).emit("private message", socket.handshake.query.username, message);
 
 
@@ -75,7 +75,7 @@ const deleteUserFromOnlineUser = async (username) => {
 }
 
 
-const sendPrivateMessage = async (socket, message) => {
+const sendPrivateMessage = async (socket, message, callback) => {
     try {
         const user = await OnlineUser.findOne({username : message.to})
         const sockets = user.sockets
@@ -85,8 +85,19 @@ const sendPrivateMessage = async (socket, message) => {
             });
             
         }
+        callback({
+            status : 'ok'
+        })
     } catch (error) {
         console.log('unable to find user')
+        const user = await User.findOne({username : message.to})
+        const firebaseToken = user.firebasetoken
+        console.log(user, firebaseToken)
+        callback({
+            status : 'offline',
+            token : firebaseToken,
+            message : message.message
+        })
     }
 }
 

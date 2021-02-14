@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema({
         minLength : 6,
         unique : true
     },
+    firebasetoken : {
+        type : String,
+        trim : true,
+        unique : true
+    },
     tokens : [{
         token : {
             type: String,
