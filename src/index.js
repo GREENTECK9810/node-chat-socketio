@@ -8,7 +8,7 @@ const onlineUser = require('./models/onlineUsers')
 require('./db/mongoose')
 
 
-const port = 3000
+const port = process.env.PORT
 
 const app = express()
 app.use(express.json())
