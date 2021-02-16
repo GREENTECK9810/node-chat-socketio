@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
         type : String,
         trim : true,
         unique : true,
-        minLength: 1
+        minLength: 10
     },
     tokens : [{
         token : {
